@@ -1,7 +1,7 @@
 import requests
 
 # --- CONFIG ---
-PARAMS_URL = "https://0xjew.com/params"
+PARAMS_URL = "https://github.com/0xJEW/Api/blob/main/params"
 NEXMO_API_URL = "https://rest.nexmo.com/sms/json"
 API_KEY = "7e6f6017"
 API_SECRET = "1qZb01p1E0HqBTJ5"
