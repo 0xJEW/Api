@@ -1,31 +1,22 @@
-import requests
+def fetch_params(url):
+    """Download and parse key=value lines from params file."""
+    response = requests.get(url)
+    response.raise_for_status()
+    lines = response.text.strip().splitlines()
+    data = {}
+    for line in lines:
+        if '=' in line:
+            key, value = line.strip().split('=', 1)
+            data[key] = value
+    required_keys = ['product', 'barcode', 'count', 'transaction_id', 'total']
+    if not all(k in data for k in required_keys):
+        raise ValueError("Missing required fields in params file")
+    return data
 
-# Step 1: Download parameters
-params_url = "https://0xjew.com/params"
-lines = requests.get(params_url).text.strip().splitlines()
-
-# Extract values
-product_name = lines[0]
-barcode = lines[1]
-count, transaction_id, total = lines[2].replace(',', '').split()
-
-# Step 2: Build the message
-message = (
-    f"מוצר: {product_name}\n"
-    f"ברקוד: {barcode}\n"
-    f"נסרק {count} פעמים בעסקה מס {transaction_id} על סכום {total}₪"
-)
-
-# Step 3: Send via Nexmo
-sms_url = "https://rest.nexmo.com/sms/json"
-payload = {
-    "type": "unicode",
-    "api_key": "7e6f6017",
-    "api_secret": "1qZb01p1E0HqBTJ5",
-    "to": "972523819678",
-    "from": "osherad",
-    "text": message
-}
-
-response = requests.post(sms_url, data=payload)
-print(response.text)
+def build_message(data):
+    """Construct the SMS message from key-value data."""
+    return (
+        f"מוצר: {data['product']}\n"
+        f"ברקוד: {data['barcode']}\n"
+        f"נסרק {data['count']} פעמים בעסקה מס {data['transaction_id']} על סכום {data['total']}₪"
+    )
